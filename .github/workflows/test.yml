@@ -1,1 +1,20 @@
+name: Test
 
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    
+jobs:
+  check-commit-message:
+    name: Check Commit Message
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Commit Type
+        uses: gsactions/commit-message-checker@v1
+        with:
+          pattern: '.{7,}'
+          flags: 'gm'
+          error: 'Commit message is too short'
+  
