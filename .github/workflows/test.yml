@@ -16,6 +16,7 @@ jobs:
         with:
           pattern: '.{7,}'
           flags: 'gm'
+          checkAllCommitMessages: true
           error: 'Commit message is too short'
       - name: Chech if includes only letters
         uses: gsactions/commit-message-checker@v1
