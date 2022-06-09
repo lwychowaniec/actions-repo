@@ -22,8 +22,8 @@ jobs:
       - name: Chech if includes only letters
         uses: gsactions/commit-message-checker@v1
         with:
-          pattern: '[A-Za-z]+'
-          flags: ''
+          pattern: '^[A-Za-z]+$'
+          flags: 'gm'
           checkAllCommitMessages: 'true'
           accessToken: ${{ secrets.GITHUB_TOKEN }}
           error: 'Only letters are allowed!!1'
