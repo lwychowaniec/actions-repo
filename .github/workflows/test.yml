@@ -23,7 +23,7 @@ jobs:
         uses: gsactions/commit-message-checker@v1
         with:
           pattern: '[A-Za-z]+'
-          flags: 'gm'
+          flags: ''
           checkAllCommitMessages: 'true'
           accessToken: ${{ secrets.GITHUB_TOKEN }}
           error: 'Only letters are allowed!!1'
