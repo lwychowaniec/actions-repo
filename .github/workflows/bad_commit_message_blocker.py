@@ -1,5 +1,5 @@
 import sys
 
-print("Received commits message:")
-print(sys.argv[2])
+print("Received commits message:" + sys.argv[2])
+print()
 sys.exit(0)
