@@ -5,8 +5,8 @@ eval git fetch --all
 
 script_dir="$(dirname "$0")"
 cd $script_dir
-
-commits_since_master=$(git rev-list HEAD origin/${GITHUB_HEAD_REF} ^origin/main)
+eval git checkout ${GITHUB_HEAD_REF:-$(basename ${GITHUB_REF})}
+commits_since_master=$(git rev-list HEAD ^origin/${GITHUB_HEAD_REF})
 echo $commits_since_master
 
 while read -r commit_hash; do
