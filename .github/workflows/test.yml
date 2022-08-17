@@ -1,30 +1,24 @@
 name: Test
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-    
+
 jobs:
   check-commit-message:
     name: Check Commit Message
     runs-on: ubuntu-latest
     steps:
-      - name: Check Commit Length
-        uses: gsactions/commit-message-checker@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
-          pattern: '.{7,}'
-          flags: 'gm'
-          checkAllCommitMessages: 'true'
-          accessToken: ${{ secrets.GITHUB_TOKEN }}
-          error: 'Commit message is too short'
-      - name: Chech if includes only letters
-        uses: gsactions/commit-message-checker@v1
-        with:
-          pattern: '^[A-Za-z]+$'
-          flags: 'gm'
-          checkAllCommitMessages: 'true'
-          accessToken: ${{ secrets.GITHUB_TOKEN }}
-          error: 'Only letters are allowed!!1'
-  
+          distribution: 'adopt'
+          java-version: '17'
+      - name: Verify commit messages
+        run: |
+          chmod u+x .github/workflows/entry.sh
+          .github/workflows/entry.sh
+
