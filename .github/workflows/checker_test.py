@@ -24,18 +24,18 @@ class TestCommitChecker(unittest.TestCase):
         test_messages = ['API-6666: delete all tests',
                          'API-6667:fix sth',
                          'no tags here',
-                         'API-5555:No space after colon']
+                         'API-5555:No space after colon',
+                         'Dot not allowed.']
         for message in test_messages:
             with self.subTest():
-                self.assertFalse(checker.doesnt_start_with_capital_letter(message))
+                self.assertFalse(checker.is_title_valid(message))
 
     def test_title_starts_with_capital_letter(self):
         test_messages = ['API-6666: Im fine',
                          'No tags here']
         for message in test_messages:
             with self.subTest():
-                self.assertTrue(checker.doesnt_start_with_capital_letter(message))
-
+                self.assertTrue(checker.is_title_valid(message))
 
     def test_fetch_title(self):
         test_messages = ['API-6666: Commit title',
@@ -43,6 +43,20 @@ class TestCommitChecker(unittest.TestCase):
         for message in test_messages:
             with self.subTest():
                 self.assertEqual(checker.fetch_title(message), "Commit title")
+
+    def test_is_title_valid(self):
+        test_messages = ['API-6666: Im fine', 'PDF-333 Statements Pko: Title', 'MBANK-11 Ing_es: Title',
+                         '(KONTOMATIK-WQS): Fix', 'KONTOMATIK-XYZ: Fix']
+        for message in test_messages:
+            with self.subTest():
+                self.assertTrue(checker.are_tags_valid(message))
+
+    def test_detects_invalid_tags(self):
+        test_messages = ['API 6666: Title', 'PDF-333 Statemynts Pko: Title', 'MBANK-11 ing_es: Title',
+                         '(KONTOMAT-WQS): Fix', 'KONTOMATIK-XYy: Fix', 'Api-5555: Title']
+        for message in test_messages:
+            with self.subTest():
+                self.assertFalse(checker.are_tags_valid(message))
 
 
 if __name__ == '__main__':

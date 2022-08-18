@@ -1,13 +1,15 @@
-import curses.ascii
+import re
 import sys
 from curses.ascii import isupper
+
+ALLOWED_TAGS_PATTERS = ['^[a-zA-z]+-[0-9]+$', '^[A-Z][a-z]+(Api)?(_\\w{2})?$', '^\\(?KONTOMATIK-[\\w]{3,}\\)?$', '^Statements$']
 
 
 def contains_review_leftover(message: str) -> bool:
     lowercase = message.lower()
     words = lowercase.split()
     for word in words:
-        if (word == 'cr') | (word == 'wip'):
+        if (word == 'cr') or (word == 'wip'):
             print('Detected review leftover in commit message')
             return True
 
@@ -19,21 +21,37 @@ def is_suspiciously_short(message: str) -> bool:
     return False
 
 
-def doesnt_start_with_capital_letter(message: str) -> bool:
+def is_title_valid(message: str) -> bool:
     if ':' in message:
-        index_after_colon = message.index(':') + 1
-        title = message[index_after_colon:]
-        return (title[0] == ' ') & (isupper(title[1]))
-    else:
-        return isupper(message[0])
+        index_after_colon = message.index(':')
+        if message[index_after_colon] == ' ':
+            print('Colon separating title from tags should be followed by blank space')
+            return False
+    title = fetch_title(message)
+    return (isupper(title[0])) and (not (title[-1] in '.,?!'))
 
 
 def fetch_title(message: str) -> str:
     if ':' in message:
-        index_after_colon = message.index(':') + 2
-        return message[index_after_colon:]
+        title_first_index = message.index(':') + 2
+        return message[title_first_index:]
     else:
         return message
+
+
+def are_tags_valid(message: str) -> bool:
+    tags = fetch_tags(message)
+    for tag in tags:
+        if not matches_any_known_tag(tag):
+            return False
+    return True
+
+
+def matches_any_known_tag(tag: str) -> bool:
+    for pattern in ALLOWED_TAGS_PATTERS:
+        if re.match(pattern, tag):
+            return True
+    return False
 
 
 def fetch_tags(message: str) -> list:
@@ -45,18 +63,9 @@ def fetch_tags(message: str) -> list:
         return []
 
 
-def is_title_valid(title: str) -> bool:
-    return (isupper(title[1])) & curses.ascii.ispunct()
-
-
-def are_tags_valid(tags: list) -> bool:
-    print(tags[1])
-    return False
-
-
 def main():
     message = sys.argv[1]
-    if contains_review_leftover(message) | is_suspiciously_short(message) | doesnt_start_with_capital_letter(message):
+    if contains_review_leftover(message) or is_suspiciously_short(message) or is_title_valid(message):
         sys.exit(1)
     sys.exit(0)
 
