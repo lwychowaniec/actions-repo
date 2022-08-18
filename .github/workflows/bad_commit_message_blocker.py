@@ -1,3 +1,4 @@
+import curses.ascii
 import sys
 from curses.ascii import isupper
 
@@ -21,10 +22,36 @@ def is_suspiciously_short(message: str) -> bool:
 def doesnt_start_with_capital_letter(message: str) -> bool:
     if ':' in message:
         index_after_colon = message.index(':') + 1
-        after_tags = message[index_after_colon:]
-        return (after_tags[0] == ' ') & (isupper(after_tags[1]))
+        title = message[index_after_colon:]
+        return (title[0] == ' ') & (isupper(title[1]))
     else:
         return isupper(message[0])
+
+
+def fetch_title(message: str) -> str:
+    if ':' in message:
+        index_after_colon = message.index(':') + 2
+        return message[index_after_colon:]
+    else:
+        return message
+
+
+def fetch_tags(message: str) -> list:
+    if ':' in message:
+        colon_index = message.index(':')
+        raw_tags = message[:colon_index]
+        return raw_tags.split()
+    else:
+        return []
+
+
+def is_title_valid(title: str) -> bool:
+    return (isupper(title[1])) & curses.ascii.ispunct()
+
+
+def are_tags_valid(tags: list) -> bool:
+    print(tags[1])
+    return False
 
 
 def main():

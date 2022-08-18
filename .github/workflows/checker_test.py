@@ -37,5 +37,13 @@ class TestCommitChecker(unittest.TestCase):
                 self.assertTrue(checker.doesnt_start_with_capital_letter(message))
 
 
+    def test_fetch_title(self):
+        test_messages = ['API-6666: Commit title',
+                         'Commit title']
+        for message in test_messages:
+            with self.subTest():
+                self.assertEqual(checker.fetch_title(message), "Commit title")
+
+
 if __name__ == '__main__':
     unittest.main()
