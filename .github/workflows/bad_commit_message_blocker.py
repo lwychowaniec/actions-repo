@@ -2,7 +2,14 @@ import re
 import sys
 from curses.ascii import isupper
 
-ALLOWED_TAGS_PATTERS = ['^[a-zA-z]+-[0-9]+$', '^[A-Z][a-z]+(Api)?(_\\w{2})?$', '^\\(?KONTOMATIK-[\\w]{3,}\\)?$', '^Statements$']
+ALLOWED_TAGS_PATTERS = ['^[A-Z]+-[0-9]+$', '^[A-Z][a-z]+(Api)?(_[a-z]{2})?$', '^\\(?KONTOMATIK-[A-Z]{3,}\\)?$']
+
+
+def main(message: str):
+    if contains_review_leftover(message) or is_suspiciously_short(message):
+        sys.exit(1)
+    message_valid = is_title_valid(message) and are_tags_valid(message)
+    sys.exit(0 if message_valid else 1)
 
 
 def contains_review_leftover(message: str) -> bool:
@@ -43,15 +50,9 @@ def are_tags_valid(message: str) -> bool:
     tags = fetch_tags(message)
     for tag in tags:
         if not matches_any_known_tag(tag):
+            print('Tag ' + tag + " doesn't match any known tag pattern")
             return False
     return True
-
-
-def matches_any_known_tag(tag: str) -> bool:
-    for pattern in ALLOWED_TAGS_PATTERS:
-        if re.match(pattern, tag):
-            return True
-    return False
 
 
 def fetch_tags(message: str) -> list:
@@ -63,12 +64,12 @@ def fetch_tags(message: str) -> list:
         return []
 
 
-def main():
-    message = sys.argv[1]
-    if contains_review_leftover(message) or is_suspiciously_short(message) or is_title_valid(message):
-        sys.exit(1)
-    sys.exit(0)
+def matches_any_known_tag(tag: str) -> bool:
+    for pattern in ALLOWED_TAGS_PATTERS:
+        if re.match(pattern, tag):
+            return True
+    return False
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1])

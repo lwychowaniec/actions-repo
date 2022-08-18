@@ -44,6 +44,12 @@ class TestCommitChecker(unittest.TestCase):
             with self.subTest():
                 self.assertEqual(checker.fetch_title(message), "Commit title")
 
+    def test_fetch_tags(self):
+        test_message = 'PDF-333 Statements Pko KONTOMATIK-XYZ: Title'
+        tags = checker.fetch_tags(test_message)
+        expected = ['PDF-333', 'Statements', 'Pko', 'KONTOMATIK-XYZ']
+        self.assertListEqual(tags, expected)
+
     def test_is_title_valid(self):
         test_messages = ['API-6666: Im fine', 'PDF-333 Statements Pko: Title', 'MBANK-11 Ing_es: Title',
                          '(KONTOMATIK-WQS): Fix', 'KONTOMATIK-XYZ: Fix']
@@ -51,12 +57,34 @@ class TestCommitChecker(unittest.TestCase):
             with self.subTest():
                 self.assertTrue(checker.are_tags_valid(message))
 
+    def test_detects_invalid_titles(self):
+        test_messages = ['API-6666: im bad', 'PDF-333:No space after colon', 'MBANK-11: Dot at end.']
+        for message in test_messages:
+            with self.subTest():
+                self.assertFalse(checker.is_title_valid(message))
+
     def test_detects_invalid_tags(self):
-        test_messages = ['API 6666: Title', 'PDF-333 Statemynts Pko: Title', 'MBANK-11 ing_es: Title',
+        test_messages = ['API 6666: Title', 'MBANK-11 ing_es: Title',
                          '(KONTOMAT-WQS): Fix', 'KONTOMATIK-XYy: Fix', 'Api-5555: Title']
         for message in test_messages:
             with self.subTest():
                 self.assertFalse(checker.are_tags_valid(message))
+
+    def test_integration_invalid_messages(self):
+        test_messages = ['wip', 'short', 'API 6666: Wrong tag', 'MBANK-11 ing_es: wrong title',
+                         'API-4444:No blank space']
+        for message in test_messages:
+            with self.assertRaises(SystemExit) as sys_exit:
+                checker.main(message)
+            self.assertEqual(sys_exit.exception.code, 1)
+
+    def test_integration(self):
+        test_messages = ['API-6666: Title', 'MBANK-11 Statements Ing_es: Nasty bug',
+                         'KONTOMATIK-ASD: Sentry fix']
+        for message in test_messages:
+            with self.assertRaises(SystemExit) as sys_exit:
+                checker.main(message)
+            self.assertEqual(sys_exit.exception.code, 0)
 
 
 if __name__ == '__main__':
