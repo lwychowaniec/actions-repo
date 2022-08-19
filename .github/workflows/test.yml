@@ -13,6 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ env.GITHUB_HEAD_REF }}
       - name: Verify commit messages
         run: |
           chmod u+x .github/workflows/entry.sh
