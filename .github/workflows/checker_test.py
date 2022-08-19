@@ -72,7 +72,8 @@ class TestCommitChecker(unittest.TestCase):
 
     def test_integration_invalid_messages(self):
         test_messages = ['wip', 'short', 'API 6666: Wrong tag', 'MBANK-11 ing_es: wrong title',
-                         'API-4444:No blank space']
+                         'API-4444:No blank space',
+                         'API-1234: Title with body!\n\n Commit body.']
         for message in test_messages:
             with self.assertRaises(SystemExit) as sys_exit:
                 checker.main(message)
@@ -80,7 +81,8 @@ class TestCommitChecker(unittest.TestCase):
 
     def test_integration(self):
         test_messages = ['API-6666: Title', 'MBANK-11 Statements Ing_es: Nasty bug',
-                         'KONTOMATIK-ASD: Sentry fix']
+                         'KONTOMATIK-ASD: Sentry fix',
+                         'API-1234: Title with body\n\n Commit body.']
         for message in test_messages:
             with self.assertRaises(SystemExit) as sys_exit:
                 checker.main(message)

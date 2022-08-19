@@ -5,11 +5,21 @@ from curses.ascii import isupper
 ALLOWED_TAGS_PATTERS = ['^[A-Z]+-[0-9]+$', '^[A-Z][a-z]+(Api)?(_[a-z]{2})?$', '^\\(?KONTOMATIK-[A-Z]{3,}\\)?$']
 
 
-def main(message: str):
+def main(commit: str):
+    message = fetch_first_line(commit)
+    print('Checking commit: ' + message)
     if contains_review_leftover(message) or is_suspiciously_short(message):
         sys.exit(1)
     message_valid = is_title_valid(message) and are_tags_valid(message)
     sys.exit(0 if message_valid else 1)
+
+
+def fetch_first_line(message: str) -> str:
+    if '\n' in message:
+        newline = message.index('\n')
+        return message[:newline]
+    else:
+        return message
 
 
 def contains_review_leftover(message: str) -> bool:
@@ -30,12 +40,12 @@ def is_suspiciously_short(message: str) -> bool:
 
 def is_title_valid(message: str) -> bool:
     if ':' in message:
-        index_after_colon = message.index(':')
-        if message[index_after_colon] == ' ':
+        index_after_colon = message.index(':') + 1
+        if message[index_after_colon] != ' ':
             print('Colon separating title from tags should be followed by blank space')
             return False
     title = fetch_title(message)
-    return (isupper(title[0])) and (not (title[-1] in '.,?!'))
+    return verify_title_first_and_last_char(title)
 
 
 def fetch_title(message: str) -> str:
@@ -44,6 +54,16 @@ def fetch_title(message: str) -> str:
         return message[title_first_index:]
     else:
         return message
+
+
+def verify_title_first_and_last_char(title: str) -> bool:
+    starts_with_upper = isupper(title[0])
+    if not starts_with_upper:
+        print('Title first char should be in uppercase')
+    end_with_punctuation = title[-1] in '.,?!'
+    if end_with_punctuation:
+        print('Punctation mark at title end is not allowed')
+    return starts_with_upper and not end_with_punctuation
 
 
 def are_tags_valid(message: str) -> bool:
