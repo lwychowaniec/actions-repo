@@ -18,6 +18,7 @@ jobs:
           ref: ${{ env.GITHUB_HEAD_REF }}
       - name: Verify commit messages
         run: |
+          echo ${{ github.head_ref }}
           chmod u+x .github/workflows/entry.sh
           .github/workflows/entry.sh
 
