@@ -14,11 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
-          ref: ${{ env.GITHUB_HEAD_REF }}
+          fetch-depth: 2
       - name: Verify commit messages
         run: |
-          echo ${{ github.head_ref }}
           chmod u+x .github/workflows/entry.sh
           .github/workflows/entry.sh
 
